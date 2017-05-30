@@ -66,7 +66,9 @@ Before we can do that, we need to link our source provider to Docker Cloud. As t
 
 Once the account is linked, we can go back to the `build` tab of our `api` repository and select the GitHub repository of our application.
 
-The `Autobuild` rule is activated by default. We just need to specify the `BUILD LOCATION` so it uses Docker infrastructure to build the image.
+![CloudRegistry07](./images/CloudRegistry-07.png)
+
+At this stage we want to use the `Autobuild` option (which is activated by default). On top of this we just need to specify the `BUILD LOCATION` so it uses Docker infrastructure to build the image.
 
 The Node.js api source code is available on GitHub in [https://github.com/lucj/api](https://github.com/lucj/api). Now the link is established between the GitHub repository and the Docker Cloud one, we can push some code to GitHub and observe how the image creation is triggered.
 
@@ -82,7 +84,12 @@ To git@github.com:lucj/api.git
 Branch master set up to track remote branch master from origin.
 ```
 
-IMAGES
+![CloudRegistry08](./images/CloudRegistry-08.png)
+![CloudRegistry09](./images/CloudRegistry-09.png)
+![CloudRegistry10](./images/CloudRegistry-10.png)
+![CloudRegistry11](./images/CloudRegistry-11.png)
+![CloudRegistry12](./images/CloudRegistry-12.png)
+![CloudRegistry13](./images/CloudRegistry-13.png)
 
 ### Setup the automated test
 
