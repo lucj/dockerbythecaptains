@@ -1,10 +1,10 @@
-## Docker Cloud
+# Docker Cloud
 
-Docker Cloud is 100% web based CaaS (Container as a Service) platform hosted by Docker. It allows to easily manage containerized applications.
+Docker Cloud is 100% web based CaaS (Container as a Service) platform hosted by Docker which allows to easily manage containerized applications.
 
-The interface offers the possibility to:
+It allows to:
 
-- create image repositories 
+- create image repositories (the place where the versions of the images are stored)
 - configure a continuous integration pipeline triggering the creation of an image and some application testing when code is pushed to source control
 - create an application and deploy it on the infrastructure of several cloud providers
 - setup a continuous deploiement pipeline which automates the deploiement of the application once the tests passed
@@ -15,47 +15,54 @@ In short, Docker Cloud allows to setup a fully CI/CD pipeline in an easy and sec
 
 Still in beta version at the date of this writing is the management of a fleet of swarm directly within Docker Cloud. This feature will be developed later in this section.
 
-## Login on Docker Cloud
+## Login
 
-The interface is available at [https://cloud.docker.com](https://cloud.docker.com), if you already have an account on Docker Hub, the same credentials must be used.
+The interface is available at [https://cloud.docker.com](https://cloud.docker.com). If you already have an account on Docker Hub, the same credentials must be used.
 
 ![cloud.docker.com](./images/Login.png)
 
-When logged on, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs, each of them is a step that will allows use to deploy an application on the cloud, including a full CI/CD pipeline.
+When logged on, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs. Each of the tab details a step to deploy an application and its full CI/CD pipeline in the cloud.
 
 ![CloudRegistry01](./images/CloudRegistry-01.png)
 
-We will also see that each tab containers several links towards [Docker online documentation](https://docs.docker.com) to help us in the process.
+To help in the setup, each tab also provides links towards [Docker online documentation](https://docs.docker.com).
 
 ## Creation of the repository
 
 From the first tab (the default one), we can create repository which will hold our images.
 
-IMAGE
-
 Let's create a repository named `api` that we will use to store the images of a simple Node.js api.
 
-IMAGE
+At this stage, there is not a lot of information to provide, we only need:
+- the name of the repository
+- a optional description
+- the visibility of the repository (we leave the default value (`public`) so that anyone can use it)
+
+![CloudRegistry02](./images/CloudRegistry-02.png)
+
+Once it's created, we have the following information.
+
+![CloudRegistry03](./images/CloudRegistry-03.png)
 
 ## Setup the continuous integration
 
-IMAGE
+From the screenshot above, we can see there are several tabs that will help us to get information and configure the repository.
 
-Once the repository is created, it can be configured through several tabs 
+- The `general` tab which provides basic information of the repository
 
 - The `tags` tab shows the different tags (image version) pushed to the repository. As no image have been pushed yet, there is no tag and we are explained how an image can be pushed.
 
-IMAGE
+![CloudRegistry04](./images/CloudRegistry-04.png)
 
-- The `build` tab is an interesting one as it allows to trigger a build of the image each time there is some code pushed to a [GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/) repository.
+- The `build` tab is an interesting one as it allows to setup an automated build of the image (we will be able to trigger a build of the image each time some code is pushed to a [GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/) repository.
 
-IMAGE
+![CloudRegistry05](./images/CloudRegistry-05.png)
 
 ### Setup the automated build
 
-The source code of our Node.js api is in GitHub, we will link a GitHub account to Docker Cloud. Clicking the `Link with GitHub` icon, the `Source providers` section of the `Cloud Settings` menu is opened. From there we can connect our GitHub account to Docker Cloud.
+Before we can do that, we need to link our source provider to Docker Cloud. As the source code of our Node.js api is in GitHub, we link a GitHub account. Clicking the `Link with GitHub` icon, the `Source providers` section of the `Cloud Settings` menu is opened. From there we can connect our GitHub account to Docker Cloud.
 
-IMAGE
+![CloudRegistry06](./images/CloudRegistry-06.png)
 
 Once the account is linked, we can go back to the `build` tab of our `api` repository and select the GitHub repository of our application.
 
