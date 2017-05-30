@@ -40,33 +40,31 @@ At this stage, there is not a lot of information to provide, we only need:
 
 ![CloudRegistry02](./images/CloudRegistry-02.png)
 
-Once it's created, we have the following information.
+Once it's created, the `general` tab which provides basic information of the repository
 
 ![CloudRegistry03](./images/CloudRegistry-03.png)
 
-## Setup the continuous integration
-
-From the screenshot above, we can see there are several tabs that will help us to get information and configure the repository.
-
-- The `general` tab which provides basic information of the repository
-
-- The `tags` tab shows the different tags (image version) pushed to the repository. As no image have been pushed yet, there is no tag and we are explained how an image can be pushed.
+Whereas the `tags` tab shows the different tags (image version) pushed to the repository. As no image have been pushed yet, the list of tag is empty.
+We are also provided the command to use in order to push an image to the repository.
 
 ![CloudRegistry04](./images/CloudRegistry-04.png)
 
-- The `build` tab is an interesting one as it allows to setup an automated build of the image (we will be able to trigger a build of the image each time some code is pushed to a [GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/) repository.
 
-![CloudRegistry05](./images/CloudRegistry-05.png)
+## Setup the continuous integration
+
+From the screenshot above, the `build` tab is an interesting one as it allows to setup an automated build of the image (we will be able to trigger a build of the image each time some code is pushed to a [GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/) repository.
+
+![CI01](./images/CI-01.png)
 
 ### Setup the automated build
 
 Before we can do that, we need to link our source provider to Docker Cloud. As the source code of our Node.js api is in GitHub, we link a GitHub account. Clicking the `Link with GitHub` icon, the `Source providers` section of the `Cloud Settings` menu is opened. From there we can connect our GitHub account to Docker Cloud.
 
-![CloudRegistry06](./images/CloudRegistry-06.png)
+![CI02](./images/CI-02.png)
 
 Once the account is linked, we can go back to the `build` tab of our `api` repository and select the GitHub repository of our application.
 
-![CloudRegistry07](./images/CloudRegistry-07.png)
+![CI03](./images/CI-03.png)
 
 At this stage we want to use the `Autobuild` option (which is activated by default). On top of this we just need to specify the `BUILD LOCATION` so it uses Docker infrastructure to build the image.
 
@@ -84,12 +82,19 @@ To git@github.com:lucj/api.git
 Branch master set up to track remote branch master from origin.
 ```
 
-![CloudRegistry08](./images/CloudRegistry-08.png)
-![CloudRegistry09](./images/CloudRegistry-09.png)
-![CloudRegistry10](./images/CloudRegistry-10.png)
-![CloudRegistry11](./images/CloudRegistry-11.png)
-![CloudRegistry12](./images/CloudRegistry-12.png)
-![CloudRegistry13](./images/CloudRegistry-13.png)
+The build then goes from the `pending`state
+![CI04](./images/CI-04.png)
+
+... to the `building` state...
+![CI05](./images/CI-05.png)
+
+... and finally to the `built` state
+![CI06](./images/CI-06.png)
+
+
+![CI07](./images/CI-07.png)
+![CI08](./images/CI-08.png)
+![CI09](./images/CI-09.png)
 
 ### Setup the automated test
 
