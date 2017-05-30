@@ -15,27 +15,36 @@ In short, Docker Cloud allows to setup a fully CI/CD pipeline in an easy and sec
 
 Still in beta version at the date of this writing is the management of a fleet of swarm directly within Docker Cloud. This feature will be developed later in this section.
 
-## Login
+## Sample application
 
-The interface is available at [https://cloud.docker.com](https://cloud.docker.com). If you already have an account on Docker Hub, the same credentials must be used.
+To illustrate the usage of Docker Cloud, we will consider a sample Node.js api that exposes a single endpoint and retuns a json message inviting you to visit a random city.
+The code is available on [https://github.com/lucj/api](https://github.com/lucj/api). Basically, the application is composed of:
+
+- app.js: definition of the http server
+- index.js: entry point which calls app.js
+- package.json: list of the application dependencies, definition of the `start` and `test` actions.
+- Dockerfile
+- test: folder containing a simple test scenario
+
+## Login onto Docker Cloud
+
+The Docker Cloud interface is available at [https://cloud.docker.com](https://cloud.docker.com). If you already have an account on Docker Hub, the same credentials must be used.
 
 ![cloud.docker.com](./images/Login.png)
 
 When logged on, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs. Each of the tab details a step to deploy an application and its full CI/CD pipeline in the cloud.
 
-![CloudRegistry01](./images/CloudRegistry-01.png)
-
 To help in the setup, each tab also provides links towards [Docker online documentation](https://docs.docker.com).
 
 ## Creation of the repository
 
-From the first tab (the default one), we can create repository which will hold our images.
+![CloudRegistry01](./images/CloudRegistry-01.png)
 
-Let's create a repository named `api` that we will use to store the images of a simple Node.js api.
+From the `Cloud registry` tab, we can create repository which will hold the images of our Node.js api. Let's create a repository and name it `api`.
 
 At this stage, there is not a lot of information to provide, we only need:
 - the name of the repository
-- a optional description
+- a description (optional)
 - the visibility of the repository (we leave the default value (`public`) so that anyone can use it)
 
 ![CloudRegistry02](./images/CloudRegistry-02.png)
@@ -44,31 +53,38 @@ Once it's created, the `general` tab which provides basic information of the rep
 
 ![CloudRegistry03](./images/CloudRegistry-03.png)
 
-Whereas the `tags` tab shows the different tags (image version) pushed to the repository. As no image have been pushed yet, the list of tag is empty.
+The `tags` tab shows the tags (each tag representing a version of the image) pushed to the repository. As no image have been pushed yet, the list is empty.
 We are also provided the command to use in order to push an image to the repository.
 
 ![CloudRegistry04](./images/CloudRegistry-04.png)
 
-
 ## Setup the continuous integration
 
-From the screenshot above, the `build` tab is an interesting one as it allows to setup an automated build of the image (we will be able to trigger a build of the image each time some code is pushed to a [GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/) repository.
+![CI00](./images/CI-00.png)
+
+From detailed view of the repository, the `build` tab is an interesting one as it allows to setup an automated build of the image. The idea behind this is to be able to trigger a build of the image each time some code is pushed to the corresponding repository of the underlying source control system ([GitHub](https://github.com) or [Bitbucket](https://bitbucket.org/)).
 
 ![CI01](./images/CI-01.png)
 
 ### Setup the automated build
 
-Before we can do that, we need to link our source provider to Docker Cloud. As the source code of our Node.js api is in GitHub, we link a GitHub account. Clicking the `Link with GitHub` icon, the `Source providers` section of the `Cloud Settings` menu is opened. From there we can connect our GitHub account to Docker Cloud.
+As the source code of our Node.js api is in GitHub, we need to link the GitHub account to the Docker Cloud account. When we click on the `Link to GitHub` icon, we have access to the `Source providers` section of the `Cloud Settings` menu. From there we can easily connect both accounts.
 
 ![CI02](./images/CI-02.png)
 
-Once the account is linked, we can go back to the `build` tab of our `api` repository and select the GitHub repository of our application.
+Once this is done, we can go back to the `build` tab of the `api` repository and configure the build as follow:
+
+- SOURCE REPOSITORY: select the GitHub repository which holds the source code (lucj/api in this example).
+- BUILD LOCATION: make it use the smallest machine of the Docker infrastructure
+- DOCKER VERSION: we use the default value (latest Docker EE)
+- AUTOTEST: we leave this option deactivated for now on, we will use it in a next step
+- BUILD RULES: this is where the magic happens. By default, each push on the master branch in GitHub will result in the build of the `latest` tag of the image. By default, the Dockerfile is expected to be at the root of the project repository. The `Autobuild` option is also enabled by default (which makes sense as we want to setup an automated build).
 
 ![CI03](./images/CI-03.png)
 
-At this stage we want to use the `Autobuild` option (which is activated by default). On top of this we just need to specify the `BUILD LOCATION` so it uses Docker infrastructure to build the image.
+We can click on `Save` and we should have the automated build setup correctly.
 
-The Node.js api source code is available on GitHub in [https://github.com/lucj/api](https://github.com/lucj/api). Now the link is established between the GitHub repository and the Docker Cloud one, we can push some code to GitHub and observe how the image creation is triggered.
+Now the link is established between the GitHub repository and the Docker Cloud one, we can do some changes to the code and push it to GitHub. We will observe how the image creation is triggered.
 
 ```
 $ git push -u origin master
@@ -82,28 +98,36 @@ To git@github.com:lucj/api.git
 Branch master set up to track remote branch master from origin.
 ```
 
-The build then goes from the `pending`state
+From the `build` tab of the repository's details, we can see the build goes from the `EMPTY` status
 ![CI04](./images/CI-04.png)
 
-... to the `building` state...
+... to the `BUILDING` status...
 ![CI05](./images/CI-05.png)
 
-... and finally to the `built` state
+... and finally to the `SUCCESS` status
 ![CI06](./images/CI-06.png)
 
+From the log of the build we can see all the instructions of the Dockerfile that were executed to build the image.
 
 ![CI07](./images/CI-07.png)
+
+Going back to the repository, we can see the new tag that has been created.
+
+Note: as we did not specified any tag, each time a new image is created, it will overwrite the last version (the one with the `latest` tag). This is just for the example as this is not a suitable approach in a enterprise environment.
+
 ![CI08](./images/CI-08.png)
+
+From the `timeline` tab of the repository, we can see the history of the action performed. In the current state, we have linked the repository to GitHub and then triggered a build.
 ![CI09](./images/CI-09.png)
 
 ### Setup the automated test
 
-A push to GitHub triggers the creation of a new image, let's now go one step further and have some tests running on the newly created image.
+At this stage, we have setup Docker Cloud in a way that a push to a GitHub's repository triggers the creation of a new image. Let's now go one step further and have some tests running on the newly created image.
 
-A sample test has been added to the source code, basically it:
+The source code embeds a simple test scenario which:
 - runs the application
-- send a request on the default endpoint
-- check the application replies with a 200 HTTP Code
+- sends a request to the default endpoint
+- check taht the application replies with a 200 HTTP Code
 
 The test can be run locally with the command `npm test`.
 
@@ -121,7 +145,7 @@ info: new request at [2017-05-30T12:27:24.661Z]
   1 passing (50ms)
 ```
 
-In order for the test to be run in Docker Cloud, we need to create a `docker-compose.test.yml` file which contains the service to run the test.
+In order for the test to be run in Docker Cloud, we need to create a `docker-compose.test.yml` file which contains a service named `sut` that runs the tests. In the current example, the docker-compose.test.yml file is pretty simple and contains only the following.
 
 ```
 sut:
@@ -129,14 +153,26 @@ sut:
   command: npm test
 ```
 
-The tests will be run on the newly created image and, if successful, the image will be sent to the repository.
-After a new push in GitHub, the following screenshots illustrate:
-- the creation of the image
-- the run of the test
-- the push of the successfully tested image
+Note: if the application was dependent on other services, we would add them in the docker-compose.test.yml file as well.
 
+In the `build` tab of the repository, we need to activate the `Autotest` option in order for the test to be run automatically.
 
-IMAGES
+![CI10](./images/CI-10.png)
+
+The workflow is the following one: 
+
+- code is pushed to the GitHub repository
+- the image is created
+- the test are run on the new image
+- if the tests are successfull, the image is pushed to the repository
+
+The screenshot below illustrates the trigger of a new build.
+
+![CI11](./images/CI-11.png)
+
+We can see from the build's log that the test are performed after the image is built. Then the image is pushed to the repository.
+
+![CI12](./images/CI-12.png)
 
 In only a few steps, we have setup a continuous integration pipeline with Docker Cloud. Pretty neat !
 
