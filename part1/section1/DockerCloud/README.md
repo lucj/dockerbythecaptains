@@ -17,11 +17,13 @@ Still in beta version at the date of this writing is the management of a fleet o
 
 ## Login on Docker Cloud
 
-The interface is available at [https://cloud.docker.com](https://cloud.docker.com], if you already have an account on Docker Hub, the same credentials must be used.
+The interface is available at [https://cloud.docker.com](https://cloud.docker.com), if you already have an account on Docker Hub, the same credentials must be used.
 
-00-Login
+![cloud.docker.com](./images/Login.png)
 
 When logged on, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs, each of them is a step that will allows use to deploy an application on the cloud, including a full CI/CD pipeline.
+
+![CloudRegistry01](./images/CloudRegistry-01.png)
 
 We will also see that each tab containers several links towards [Docker online documentation](https://docs.docker.com) to help us in the process.
 
