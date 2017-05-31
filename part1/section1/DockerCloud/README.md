@@ -413,7 +413,7 @@ Going into the `api` service, we can see that 3 containers have been started.
 
 Using the endpoint provided in the stack, we can access the new instance of the application, as we have done previously, and the roundrobin in action.
 
-````
+```
 $ curl http://lb.city.9bef3348.svc.dockerapp.io:8000
 {"msg":"api-1 suggests to visit Irezivu"}
 
