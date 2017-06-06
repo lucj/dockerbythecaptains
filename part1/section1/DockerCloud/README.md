@@ -25,20 +25,21 @@
 
 # Docker Cloud
 
-Docker Cloud is 100% web based CaaS (Container as a Service) platform hosted by Docker which allows to easily manage containerized applications.
+Docker Cloud is 100% web based CaaS (Container as a Service) platform hosted by Docker and allowing to easily manage containerized applications.
 
-It allows to:
+Among other functionnalities, Docker Cloud allows to:
 
 - create image repositories (the place where the versions of the images are stored)
-- configure a continuous integration pipeline triggering the creation of an image and some application testing when code is pushed to source control
-- create an application and deploy it on the infrastructure of several cloud providers
+- create an application composed of several containers
+- manage the underlying infrastrucutre through the integration with several cloud providers
+- configure a continuous integration pipeline which automates the creation of an image and runs test on it when code is pushed to source control
 - setup a continuous deploiement pipeline which automates the deploiement of the application once the tests passed
 
-On top of this, Teams and Organizations can be created so applications components and their underlying infrastructure can be isolated from each other.
+On top of this, Teams and Organizations can be created so application's components and their underlying infrastructure can be isolated from each other.
 
 In short, Docker Cloud allows to setup a fully CI/CD pipeline in an easy and secure way.
 
-Still in beta version at the date of this writing is the management of a fleet of swarm directly within Docker Cloud. This feature will be developed later in this section.
+Still in beta version at the date of this writing: the management of a fleet of swarm directly within Docker Cloud.
 
 # Sample application
 
@@ -57,11 +58,13 @@ The Docker Cloud interface is available at [https://cloud.docker.com](https://cl
 
 ![cloud.docker.com](./images/Login.png)
 
-When logged on, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs. Each of the tab details a step to deploy an application and its full CI/CD pipeline in the cloud.
+Once logged in, the interface shows a menu on the left (we'll go through those elements later on) and a main panel with several tabs. Each of the tab details a step to deploy an application and its full CI/CD pipeline in the cloud.
 
 To help in the setup, each tab also provides links towards [Docker online documentation](https://docs.docker.com).
 
 # Traditional mode
+
+From `Traditional` I mean the default, non Swarm related mode, available in Docker Cloud.
 
 ## Creation of the repository
 
@@ -104,7 +107,7 @@ Once this is done, we can go back to the `build` tab of the `api` repository and
 - SOURCE REPOSITORY: select the GitHub repository which holds the source code (lucj/api in this example).
 - BUILD LOCATION: make it use the smallest machine of the Docker infrastructure
 - DOCKER VERSION: we use the default value (latest Docker EE)
-- AUTOTEST: we leave this option deactivated for now on, we will use it in a next step
+- AUTOTEST: we leave this option deactivated for now on, we will use it in a next step to automatically run tests on the image created
 - BUILD RULES: this is where the magic happens. By default, each push on the master branch in GitHub will result in the build of the `latest` tag of the image. By default, the Dockerfile is expected to be at the root of the project repository. The `Autobuild` option is also enabled by default (which makes sense as we want to setup an automated build).
 
 ![CI03](./images/CI-03.png)
@@ -134,17 +137,18 @@ From the `build` tab of the repository's details, we can see the build goes from
 ... and finally to the `SUCCESS` status
 ![CI06](./images/CI-06.png)
 
-From the log of the build we can see all the instructions of the Dockerfile that were executed to build the image.
+From the logs of the build we can see all the instructions of the Dockerfile that were executed to build the image.
 
 ![CI07](./images/CI-07.png)
 
 Going back to the repository, we can see the new tag that has been created.
 
-Note: as we did not specified any tag, each time a new image is created, it will overwrite the last version (the one with the `latest` tag). This is just for the example as this is not a suitable approach in a enterprise environment.
+Note: as we did not specified any tag, each time a new image is created, it will overwrite the last version (the one with the `latest` tag). In practice we would use a dedicated and unique tag for each build of an image.
 
 ![CI08](./images/CI-08.png)
 
 From the `timeline` tab of the repository, we can see the history of the action performed. In the current state, we have linked the repository to GitHub and then triggered a build.
+
 ![CI09](./images/CI-09.png)
 
 ### Setup the automated test
@@ -154,7 +158,7 @@ At this stage, we have setup Docker Cloud in a way that a push to a GitHub's rep
 The source code embeds a simple test scenario which:
 - runs the application
 - sends a request to the default endpoint
-- check taht the application replies with a 200 HTTP Code
+- make sure the application replies with a 200 HTTP Code
 
 The test can be run locally with the command `npm test`.
 
@@ -172,7 +176,7 @@ info: new request at [2017-05-30T12:27:24.661Z]
   1 passing (50ms)
 ```
 
-In order for the test to be run in Docker Cloud, we need to create a `docker-compose.test.yml` file which contains a service named `sut` that runs the tests. In the current example, the docker-compose.test.yml file is pretty simple and contains only the following.
+In order for the test to be run in Docker Cloud, we need to create a `docker-compose.test.yml` file which contains a service named `sut` which runs the test script. In the current example, the docker-compose.test.yml file is pretty simple and contains only the following.
 
 ```
 sut:
@@ -197,7 +201,7 @@ The screenshot below illustrates the trigger of a new build.
 
 ![CI11](./images/CI-11.png)
 
-We can see from the build's log that the test are performed after the image is built. Then the image is pushed to the repository.
+We can see from the build's log that the test are performed after the image is built. The image is then pushed to the repository.
 
 ![CI12](./images/CI-12.png)
 
@@ -206,7 +210,7 @@ In only a few steps, we have setup a continuous integration pipeline with Docker
 ## Application deployment
 
 The third tab of the main panel is dedicated to the deployment of the application.
-As for the previous steps, we are provided a couple of link which details what needs to be done for our application to be deployed.
+As for the previous steps, we are provided a couple of links, each one detailing what needs to be done for our application to be deployed.
 
 ![AD01](./images/AD-01.png)
 
@@ -220,7 +224,7 @@ Docker Cloud allows to deploy an application on the infrastructure of the follow
 - [SoftLayer](http://www.softlayer.com)
 - [Packet](https://www.packet.net)
 
-From the `Cloud providers` tab of the `Cloud Settings` menu item, we connect DigitalOcean to our Docker Cloud account. This will allow us to create DO Droplet and deploy our application on them.
+From the `Cloud providers` tab of the `Cloud Settings` menu item, we connect DigitalOcean to our Docker Cloud account. This will allow to create a DO Droplet (nickname of a Virtual Machine instantiated on DigitalOcean) and deploy the application on it.
 
 ### Create a DigitalOcean droplet
 
@@ -236,7 +240,7 @@ Less than one minute after, the node is ready to run our application.
 
 ### Create a service
 
-As defined in the Docker's documentation: "a service is a group of container that use the same IMAGE:TAG". Basically, a service is instanciated into one or more containers and can be scaled very easily.
+As defined in the Docker's documentation: "a service is a group of containers that use the same IMAGE:TAG". Basically, a service is instanciated into one or more containers and can be scaled very easily.
 
 Let's go ahead and create a new service based on the image we created in the previous steps.
 
@@ -247,13 +251,13 @@ The image of the service can be selected from several sources:
 
 We will go for the last option as the image we want to deploy is the one we created earlier in the `api` repository.
 
-The menu on the right lists all the configuration that can be done on the service we are about to deploy:
+The menu on the right lists the configuration option we can use to deploy the service:
 
 - some general settings (service name, image the service is based on, deploiement strategy and constraints, restart policies, ...)
 - some container's configuration options (entrypoint and command, RAM and CPU limits)
-- the ports published
-- the environment variables required
-- configuration of volume so data are decoupled from the container's lifecycle
+- the service's ports published onto the host
+- some environment variables
+- configuration of volumes so data are decoupled from the container's lifecycle
 
 In order to create a service based on the `api`, we will provide the following pieces of information:
 
@@ -276,7 +280,7 @@ $ curl http://api.9443adc3.svc.dockerapp.io:8080
 {"msg":"api-1 suggests to visit Isnozek"}
 ```
 
-The `Logs` tab show the logs of each container of the service. To differentiate the containers, each log entry is prefixed with the container's name. In the current example, only api-1 is listed as our service only have one container.
+The `Logs` tab shows the logs of each container of the service. To differentiate the containers, each log entry is prefixed with the container's name. In the current example, only api-1 is listed as our service only have one container.
 
 ![AD09](./images/AD-09.png)
 
@@ -294,7 +298,7 @@ Going back the service's `General` tab or using the `Containers` menu in the `AP
 
 ![AD12](./images/AD-12.png)
 
-- the `Timeline` tab show all the action that happened on the container
+- the `Timeline` tab shows all the actions which occured on the container
 
 - the `Terminal` tab provides a shell running in the container and allows to perform operations such as debugging related stuff
 
@@ -308,15 +312,15 @@ But wait... we get an error message. The details can be found in the service's t
 
 ![AD15](./images/AD-15.png)
 
-When we defined the service, we specified that each container exposes it's port (80) onto the port 8080 of the host. This does not raise any problem when only one container is running for the service but it's obviously an issue when several containers are running for the service as the same port on the host cannot be allocated to each one at the same time. Let's change that and specify a dynamic allocation of the port (so the Docker daemon will take care of which host's port to allocate for each service).
+When we defined the service, we specified that each container exposes it's port (80) onto the port 8080 of the host. This does not raise any problem when only one container is running for the service but it's obviously an issue when several containers are running for the same service as the same port on the host cannot be allocated to each one of them at the same time. Let's change that and specify a dynamic allocation of the port (so the Docker daemon will take care of which host's port to allocate for each container).
 
 ![AD16](./images/AD-16.png)
 
-To clear things up, we restart the service and we can no see our 3 containers running. Each one is available from a different port on the host.
+To clear things up, we restart the service and we can now see 3 containers are running. Each one is available from a different port on the host.
 
 ![AD17](./images/AD-17.png)
 
-Each container has its own endpoint exposed to the outside
+Each container has its own endpoint (host / port) exposed to the outside
 
 Container name | Container endpoint
 ---------------|-------------------
@@ -338,7 +342,7 @@ $ curl http://api-3.a5ead573.cont.dockerapp.io:32772
 {"msg":"api-3 suggests to visit Buhdezo"}
 ```
 
-In order for the incoming requests to be dispatched between the different containers of a service, we need to setup a load balancer in front of our service. This load balancer will also be defined as a service as we will see shortly.
+In order for the incoming requests to be dispatched between the different containers of a service, we need to setup a load balancer in front of the service. This load balancer will also be defined as a service.
 
 ### Launching a load-balancer
 
@@ -347,7 +351,7 @@ We create a service based on the `dockercloud/haproxy` image
 ![AD18](./images/AD-18.png)
 
 On top of the image used and the service name, there are a couple of options we need to specify during the creation step.
-First, we need to give the service some special rights (`Full access`) so it can get event from the Docker daemon and reconfigure itself.
+First, we need to give the service some special rights (`Full access`) so it can get event from the Docker daemon and reconfigure itself automatically.
 
 ![AD19](./images/AD-19.png)
 
@@ -359,7 +363,7 @@ Once the load-balancer service is deployed, we can access it using the endpoint 
 
 ![AD21](./images/AD-21.png)
 
-We can then send several requests in a row to the load balancer and have it dispaching the request in a roundrobin way to the containers of the api service.
+We can then send several requests in a row to the load balancer and have it dispaching the request in a roundrobin way to the containers of the `api` service.
 
 ```
 $ curl http://lb.31555f20.svc.dockerapp.io
@@ -379,9 +383,9 @@ $ curl http://lb.31555f20.svc.dockerapp.io
 
 ![CD-01](./images/CD-01.png)
 
-In the current status, we have automated the creation of an image, the tests, the push to a repository. We then use the image to create and deploy a service on the infrastructure of DigitalOcean. Let's go one step further again and deploy the changes after the images is available.
+In the current status, we have automated the creation of an image, the tests, the push to a repository. We then used the image to create and deploy a service on the infrastructure of DigitalOcean. Let's go one step further again and deploy the changes automatically each time a new image is available in the repository.
 
-We can say that the whole application is composed of 2 services:
+The whole application is composed of 2 services:
 - the api
 - the load balancer in front of it
 
@@ -417,7 +421,7 @@ api:
   autoredeploy: true
 ```
 
-We set the `autoredeploy` option to true, and specified 3 containers of the `api` should run by default.
+We set the `autoredeploy` option to true, and specify that 3 containers of the `api` should run by default.
 Also, in order to avoid the conflict with the currently running application, the port of the load-balancer is mapped on the port 8000 of the host.
 
 Note: all the possible options that can be used in a stack file are available in the [Stack file reference documentation](https://docs.docker.com/docker-cloud/apps/stack-yaml-reference/)
@@ -451,12 +455,12 @@ $ curl http://lb.city.9bef3348.svc.dockerapp.io:8000
 
 #  Swarm mode cluster
 
-Still in beta at the time of this writing, the management of Swarm cluster is available within Docker Cloud.
+The management of Swarm cluster from within Docker Cloud is a beta feature at the time of this writing.
 In order to switch to Swarm mode, we just need to use the slider at the top left.
 
 ![Swarm-01](./images/Swarm-01.png)
 
-After switching to Swarm mode, we are presented 4 tabs in pretty much the same way as in the non swarm mode display.
+We are then presented 4 tabs in pretty much the same way as in the non swarm mode display.
 
 ## Creation of the registry
 
@@ -475,7 +479,7 @@ This refers to the same process as the one we followed for the non swarm mode
 ![Swarm-04](./images/Swarm-04.png)
 
 This tab is the most interesting one as it allows to create a swarm on AWS (Azure is about to come) directly from Docker Cloud. Let's see that in action.
-The first thing to do is to follow the link provided to setup an AWS account within Docker Cloud (several steps to follow but not a too difficult process).
+The first thing to do is to follow the link provided to setup an AWS account within Docker Cloud (several steps to follow but not a very difficult process).
 
 ![Swarm-05](./images/Swarm-05.png)
 
@@ -487,13 +491,13 @@ Onnce this is done we can go ahead and create a swarm. There are only a couple o
 
 ![Swarm-06](./images/Swarm-06.png)
 
-- Swarm properties: we specify a key to log onto the nodes if needed, and leave the other option with their default value
-- Swarm Managers properties: we use the default value for instance type and volume type/size
+- Swarm properties: we specify a key to ssh onto the nodes if needed, and leave the other option with their default value
+- Swarm Managers properties: we use the default values for instance type and volume type/size
 - Swarm Workers properties: same as for the managers
 
 ![Swarm-07](./images/Swarm-07.png)
 
-We the created the swarm that becomes available a couple of minutes later.
+The swarm is available a couple of minutes later.
 
 ![Swarm-08](./images/Swarm-08.png)
 
@@ -521,13 +525,14 @@ Password:
     export DOCKER_HOST=tcp://127.0.0.1:32768
 ```
 
-We can then export the DOCKER_HOST environment variable as specified and run a swarm related command.
+We can then export the DOCKER_HOST environment variable as specified.
 
 ```
 $ export DOCKER_HOST=tcp://127.0.0.1:32768
 ```
 
-Let's list the nodes:
+Each docker command will then target the swarm. For instace, let's list the nodes:
+
 ```
 $ docker node ls
 ID                            HOSTNAME                                      STATUS              AVAILABILITY        MANAGER STATUS
@@ -543,7 +548,7 @@ ID                  NAME                       MODE                REPLICAS     
 7fkdmwgbg6t3        dockercloud-server-proxy   global              1/1                 dockercloud/server-proxy:latest   *:2376->2376/tcp
 ```
 
-Even if we did not specified any service, this one is a system service that allow to manage the swarm via Docker Cloud.
+Even if we did not specified any service, this one is a system service and allows to manage the swarm via Docker Cloud.
 
 We then have access to our swarm and can deploy services on it.
 
@@ -553,7 +558,7 @@ If we already have a swarm running, it's possible to bring it to Docker Cloud. I
 
 ![Swarm-10](./images/Swarm-10.png)
 
-We will illustrate that by creating a one node swarm on DigitalOcean. For this we use Docker Machine.
+We will illustrate that by creating a one node swarm on DigitalOcean using Docker Machine.
 
 ```
 $ docker-machine create \
@@ -582,19 +587,15 @@ Docker is up and running!
 To see how to connect your Docker Client to the Docker Engine running on this virtual machine, run: docker-machine env node01
 ```
 
-We can now set the environment variable so the local client points towards the newly created host.
+We can now set the environment variable so the local client points towards the newly created host...
 
 ```
 $ eval $(docker-machine env node01)
 ```
 
-We can then init the swarm
+...and we can init the swarm
 
 ```
-$ docker swarm init
-Error response from daemon: could not choose an IP address to advertise since this system has multiple addresses on interface eth0 (178.62.126.65 and 10.16.0.8) - specify one with --advertise-addr
-
-luc at neptune in ~/perso/Dropbox/Work/Traxxs/devops/machine on develop [!?]
 $ docker swarm init --advertise-addr 178.62.126.65
 Swarm initialized: current node (j56ttv2qk385ren309sejfejx) is now a manager.
 
