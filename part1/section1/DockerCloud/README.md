@@ -1,3 +1,28 @@
+# What will be covered
+
+* [What is Docker Cloud](#docker-cloud)
+* [Sample application](#sample-application)
+* [Login onto Docker Cloud](#login-onto-docker-cloud)
+* [Traditional mode](#traditional mode)
+  * [Creation of the repository](#creation-of-the-repository)
+  * [Setup the continuous integration](#setup-the-continuous-integration)
+    * [Setup the automated build](#setup-the-automated-build)
+    * [Setup the automated test](#setup-the-automated-test)
+  * [Application deployment](#application-deployment)
+    * [Link Docker Cloud with a cloud provider](#link-docker-cloud-with-a-cloud-provider)
+    * [Create a DigitalOcean droplet](#create-a-digitalocean-droplet)
+    * [Create a service](#create-a-service]
+    * [Launching a load-balancer](#launching-a-load-balancer)
+  * [Continuous deployment](#continuous-deployment)
+    * [From the service definition](#from-the-service-definition)
+    * [Using a Stack file](#using-a-stack-file)
+* [Swarm mode cluster](#swarm-mode-cluster)
+  * [Creation of the registry](#creation-of-the-registry)
+  * [Continous integration](#continous-integration)
+  * [Swarm deployment](#swarm-deployment)
+  * [Bringing our own swarm](#bringing-our-own-swarm)
+* [Summary](#summary)
+
 # Docker Cloud
 
 Docker Cloud is 100% web based CaaS (Container as a Service) platform hosted by Docker which allows to easily manage containerized applications.
