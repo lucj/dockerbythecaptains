@@ -3,7 +3,7 @@
 * [What is Docker Cloud](#docker-cloud)
 * [Sample application](#sample-application)
 * [Login onto Docker Cloud](#login-onto-docker-cloud)
-* [Traditional mode](#traditional mode)
+* [Traditional mode](#traditional-mode)
   * [Creation of the repository](#creation-of-the-repository)
   * [Setup the continuous integration](#setup-the-continuous-integration)
     * [Setup the automated build](#setup-the-automated-build)
@@ -11,7 +11,7 @@
   * [Application deployment](#application-deployment)
     * [Link Docker Cloud with a cloud provider](#link-docker-cloud-with-a-cloud-provider)
     * [Create a DigitalOcean droplet](#create-a-digitalocean-droplet)
-    * [Create a service](#create-a-service]
+    * [Create a service](#create-a-service)
     * [Launching a load-balancer](#launching-a-load-balancer)
   * [Continuous deployment](#continuous-deployment)
     * [From the service definition](#from-the-service-definition)
@@ -644,5 +644,6 @@ This one is also visible from the Docker Cloud interface.
 # Summary
 
 I hope this quite detailed view of Docker Cloud will make you want to give it a try.
-The solution is very user friendly and easy to use.
+As we have seen, this solution is easy to use and user friendly. In only a couple of steps we have setup a complete CI/CD pipeline.
+The integration with source providers and cloud providers made the whole process very easy.
 
